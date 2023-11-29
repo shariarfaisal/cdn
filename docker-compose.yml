@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  cdn-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /mnt/my_data/ftpuser1:/app/bucket
+    ports:
+      - "5051:5051"
