@@ -12,7 +12,7 @@ import (
 
 func handleUpload(c *gin.Context) {
 	// Parse the form data to retrieve the uploaded file
-	err := c.Request.ParseMultipartForm((1024 * 10) << 20) // 10 GB max file size
+	err := c.Request.ParseMultipartForm((1024 * 100) << 20) // 100 GB max file size
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Unable to parse form"})
 		return
