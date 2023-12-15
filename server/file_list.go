@@ -52,7 +52,7 @@ func (s *Server) getFiles(ctx *gin.Context) {
 		req.Page = 1
 	}
 
-	files, err := s.getFileInfoList()
+	files, size, err := s.getFileInfoList()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -69,18 +69,29 @@ func (s *Server) getFiles(ctx *gin.Context) {
 
 	result := paginateFiles(files, req.Limit, req.Page)
 
-	pagination := GetPaginationDetails(result, len(files), req.Limit, req.Page)
+	// disk size 65.49 TB
+	volumeSize := 65.49 * 1024 * 1024 * 1024 * 1024
+	info := gin.H{
+		"total_storage": ByteCountIEC(int64(volumeSize)),
+		"used_storage":  ByteCountIEC(size),
+		"free_storage":  ByteCountIEC(int64(volumeSize) - size),
+	}
+
+	pagination := GetPaginationDetails(result, len(files), req.Limit, req.Page, info)
 
 	ctx.JSON(http.StatusOK, pagination)
 }
 
-func (s *Server) getFileInfoList() ([]FileInfo, error) {
+func (s *Server) getFileInfoList() ([]FileInfo, int64, error) {
 	var files []FileInfo
+	var size int64 = 0
 
 	err := filepath.Walk(s.uploadDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
+
+		size += info.Size()
 
 		if !info.IsDir() {
 			files = append(files, FileInfo{
@@ -94,10 +105,10 @@ func (s *Server) getFileInfoList() ([]FileInfo, error) {
 	})
 
 	if err != nil && !os.IsNotExist(err) {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return files, nil
+	return files, size, nil
 }
 
 func paginateFiles(files []FileInfo, limit, page int) []FileInfo {
