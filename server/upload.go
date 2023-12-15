@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func handleUpload(c *gin.Context) {
+func (s *Server) uploadFile(c *gin.Context) {
 	// Parse the form data to retrieve the uploaded file
 	err := c.Request.ParseMultipartForm((1024 * 100) << 20) // 100 GB max file size
 	if err != nil {
@@ -84,7 +84,7 @@ func handleUpload(c *gin.Context) {
 	}
 
 	// Create a new file in the uploads directory
-	f, err := os.Create(uploadDir + "/" + handler.Filename)
+	f, err := os.Create(s.uploadDir + "/" + handler.Filename)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to create the file"})
 		return

@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"net/http"
@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func deleteFile(c *gin.Context) {
+func (s *Server) deleteFile(c *gin.Context) {
 	// Extract the file name from the URL path
 	fileName := c.Param("filename")
 	if fileName == "" {
@@ -17,7 +17,7 @@ func deleteFile(c *gin.Context) {
 
 	// delete the file from the uploads directory
 
-	err := os.Remove(uploadDir + "/" + fileName)
+	err := os.Remove(s.uploadDir + "/" + fileName)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return

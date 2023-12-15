@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"net/http"
@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func handleRetrieve(c *gin.Context) {
+func (s *Server) getFile(c *gin.Context) {
 	// Extract the file name from the URL path
 	fileName := c.Param("filename")
 	if fileName == "" {
@@ -17,7 +17,7 @@ func handleRetrieve(c *gin.Context) {
 	}
 
 	// Open the file from the uploads directory
-	file, err := os.Open(uploadDir + "/" + fileName)
+	file, err := os.Open(s.uploadDir + "/" + fileName)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
