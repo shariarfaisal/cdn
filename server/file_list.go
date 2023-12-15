@@ -106,6 +106,10 @@ func paginateFiles(files []FileInfo, limit, page int) []FileInfo {
 
 	if start < 0 {
 		start = 0
+	} else if start > len(files) {
+		start = len(files)
+	} else if end < 0 {
+		end = limit
 	}
 
 	if end > len(files) {
